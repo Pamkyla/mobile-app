@@ -1,98 +1,62 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React from 'react';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { COFFEE_MENU, CoffeeItem } from '../constants/menu';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+export default function CatalogScreen() {
+  
+  // 3. Функция, которая рисует одну кофейную карточку
+  const renderItem = ({ item }: { item: CoffeeItem }) => (
+    <View style={styles.card}>
+      <Image source={{ uri: item.image }} style={styles.image} />
+      <Text style={styles.name}>{item.name}</Text>
+      <Text style={styles.price}>{item.price}</Text>
+      
+      {/* Кнопка — при нажатии пока просто выводим стандартное мобильное уведомление */}
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={() => Alert.alert('Клик!', `Вы выбрали ${item.name}`)}
+      >
+        <Text style={styles.buttonText}>Заказать</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <View style={styles.container}>
+      {/* 4. Выводим весь наш список в виде сетки из 2 колонок */}
+      <FlatList
+        data={COFFEE_MENU}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        numColumns={2} // Делаем плиткой в два ряда
+        contentContainerStyle={styles.list}
+      />
+    </View>
   );
 }
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
-}
-
+// 5. Уютные кофейные стили (вместо привычного веб-CSS)
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+  container: { flex: 1, backgroundColor: '#FAF6F0' }, // Нежный кремовый фон
+  list: { padding: 8 },
+  card: { 
+    flex: 1, 
+    backgroundColor: '#fff', 
+    margin: 8, 
+    padding: 12, 
+    borderRadius: 12, 
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    // Тени для iOS и Android
+    elevation: 2, 
+    shadowColor: '#4A3B32', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4 
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+  image: { width: '100%', height: 120, borderRadius: 10, marginBottom: 10, resizeMode: 'cover' },
+  name: { fontSize: 15, fontWeight: '600', color: '#4A3B32', textAlign: 'center', marginBottom: 4 },
+  price: { fontSize: 14, color: '#8C6239', fontWeight: 'bold', marginBottom: 10 },
+  button: { backgroundColor: '#6F4E37', paddingVertical: 8, width: '100%', borderRadius: 8, alignItems: 'center' },
+  buttonText: { color: '#fff', fontWeight: '600', fontSize: 14 },
 });
