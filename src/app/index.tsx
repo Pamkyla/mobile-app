@@ -1,62 +1,113 @@
-import React from 'react';
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
+import Header from '../components/Header';
+import CoffeeCard from '../components/Card';
+import { COLORS } from '../constants/Theme';
+import { COFFEE_MENU } from '../constants/Menu';
 
-import { COFFEE_MENU, CoffeeItem } from '../constants/menu';
+const CATEGORIES = ['Все', 'Арабика', 'Робуста', 'Бленды', 'Спешелти'];
 
-export default function CatalogScreen() {
-  
-  // 3. Функция, которая рисует одну кофейную карточку
-  const renderItem = ({ item }: { item: CoffeeItem }) => (
-    <View style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.price}>{item.price}</Text>
-      
-      {/* Кнопка — при нажатии пока просто выводим стандартное мобильное уведомление */}
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => Alert.alert('Клик!', `Вы выбрали ${item.name}`)}
-      >
-        <Text style={styles.buttonText}>Заказать</Text>
-      </TouchableOpacity>
-    </View>
-  );
+export default function HomeScreen() {
+  const [selectedCategory, setSelectedCategory] = useState('Все');
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Ждем, пока компонент полностью загрузится в браузере/на устройстве
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const filteredMenu = selectedCategory === 'Все'
+    ? COFFEE_MENU
+    : COFFEE_MENU.filter(item => item.category === selectedCategory);
+
+  // Пока не смонтировано, возвращаем пустой экран, чтобы не было конфликта SSR
+  if (!isMounted) {
+    return <View style={{ flex: 1, backgroundColor: COLORS.background }} />;
+  }
 
   return (
     <View style={styles.container}>
-      {/* 4. Выводим весь наш список в виде сетки из 2 колонок */}
+      <Header title="Зерновой кофе" showBackButton={false} />
+
+      <View style={styles.categoriesContainer}>
+        <FlatList
+          data={CATEGORIES}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
+          contentContainerStyle={styles.categoriesList}
+          renderItem={({ item }) => {
+            const isActive = item === selectedCategory;
+            return (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => setSelectedCategory(item)}
+                style={[styles.categoryButton, isActive && styles.categoryButtonActive]}
+              >
+                <Text style={[styles.categoryText, isActive && styles.categoryTextActive]}>
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </View>
+
       <FlatList
-        data={COFFEE_MENU}
-        renderItem={renderItem}
+        data={filteredMenu}
         keyExtractor={(item) => item.id}
-        numColumns={2} // Делаем плиткой в два ряда
-        contentContainerStyle={styles.list}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
+        contentContainerStyle={styles.catalogList}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <CoffeeCard 
+            item={item} 
+            onPress={() => console.log('Переход на карточку кофе:', item.name)} 
+          />
+        )}
       />
     </View>
   );
 }
 
-// 5. Уютные кофейные стили (вместо привычного веб-CSS)
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FAF6F0' }, // Нежный кремовый фон
-  list: { padding: 8 },
-  card: { 
-    flex: 1, 
-    backgroundColor: '#fff', 
-    margin: 8, 
-    padding: 12, 
-    borderRadius: 12, 
-    alignItems: 'center',
-    // Тени для iOS и Android
-    elevation: 2, 
-    shadowColor: '#4A3B32', 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.1, 
-    shadowRadius: 4 
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
   },
-  image: { width: '100%', height: 120, borderRadius: 10, marginBottom: 10, resizeMode: 'cover' },
-  name: { fontSize: 15, fontWeight: '600', color: '#4A3B32', textAlign: 'center', marginBottom: 4 },
-  price: { fontSize: 14, color: '#8C6239', fontWeight: 'bold', marginBottom: 10 },
-  button: { backgroundColor: '#6F4E37', paddingVertical: 8, width: '100%', borderRadius: 8, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  categoriesContainer: {
+    paddingVertical: 12,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.line,
+  },
+  categoriesList: {
+    paddingHorizontal: 16,
+  },
+  categoryButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#F5F5F5',
+    marginRight: 8,
+  },
+  categoryButtonActive: {
+    backgroundColor: COLORS.primary,
+  },
+  categoryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textDark,
+  },
+  categoryTextActive: {
+    color: COLORS.white,
+  },
+  catalogList: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  row: {
+    justifyContent: 'space-around',
+  },
 });
