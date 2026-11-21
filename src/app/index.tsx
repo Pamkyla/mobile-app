@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
-import Header from '../components/Header';
-import CoffeeCard from '../components/Card';
-import { COLORS } from '../constants/Theme';
-import { COFFEE_MENU } from '../constants/Menu';
+import { useEffect, useState } from "react";
+import {
+    FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import CoffeeCard from "../components/Card";
+import { COFFEE_MENU } from "../constants/Menu";
+import { COLORS } from "../constants/Theme";
 
-const CATEGORIES = ['Все', 'Арабика', 'Робуста', 'Бленды', 'Спешелти'];
+const CATEGORIES = ["Все", "Арабика", "Робуста", "Бленды", "Спешелти"];
 
 export default function HomeScreen() {
-  const [selectedCategory, setSelectedCategory] = useState('Все');
+  const [selectedCategory, setSelectedCategory] = useState("Все");
   const [isMounted, setIsMounted] = useState(false);
 
   // Ждем, пока компонент полностью загрузится в браузере/на устройстве
@@ -16,9 +21,10 @@ export default function HomeScreen() {
     setIsMounted(true);
   }, []);
 
-  const filteredMenu = selectedCategory === 'Все'
-    ? COFFEE_MENU
-    : COFFEE_MENU.filter(item => item.category === selectedCategory);
+  const filteredMenu =
+    selectedCategory === "Все"
+      ? COFFEE_MENU
+      : COFFEE_MENU.filter((item) => item.category === selectedCategory);
 
   // Пока не смонтировано, возвращаем пустой экран, чтобы не было конфликта SSR
   if (!isMounted) {
@@ -27,8 +33,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="Зерновой кофе" showBackButton={false} />
-
       <View style={styles.categoriesContainer}>
         <FlatList
           data={CATEGORIES}
@@ -42,9 +46,17 @@ export default function HomeScreen() {
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => setSelectedCategory(item)}
-                style={[styles.categoryButton, isActive && styles.categoryButtonActive]}
+                style={[
+                  styles.categoryButton,
+                  isActive && styles.categoryButtonActive,
+                ]}
               >
-                <Text style={[styles.categoryText, isActive && styles.categoryTextActive]}>
+                <Text
+                  style={[
+                    styles.categoryText,
+                    isActive && styles.categoryTextActive,
+                  ]}
+                >
                   {item}
                 </Text>
               </TouchableOpacity>
@@ -55,15 +67,15 @@ export default function HomeScreen() {
 
       <FlatList
         data={filteredMenu}
+        numColumns={100}
         keyExtractor={(item) => item.id}
-        numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.catalogList}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <CoffeeCard 
-            item={item} 
-            onPress={() => console.log('Переход на карточку кофе:', item.name)} 
+          <CoffeeCard
+            item={item}
+            onPress={() => console.log("Переход на карточку кофе:", item.name)}
           />
         )}
       />
@@ -84,20 +96,23 @@ const styles = StyleSheet.create({
   },
   categoriesList: {
     paddingHorizontal: 16,
+    flex: 1,
+    justifyContent: "center",
+    flexWrap: "wrap",
   },
   categoryButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    marginRight: 8,
+    backgroundColor: "#F5F5F5",
+    margin: 4,
   },
   categoryButtonActive: {
     backgroundColor: COLORS.primary,
   },
   categoryText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textDark,
   },
   categoryTextActive: {
@@ -108,6 +123,9 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   row: {
-    justifyContent: 'space-around',
+    justifyContent: "center",
+    maxWidth: 500,
+    flexWrap: "wrap",
+    alignSelf: "center",
   },
 });

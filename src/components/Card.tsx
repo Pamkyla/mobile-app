@@ -1,15 +1,14 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { COLORS } from "../constants/Theme";
+import {
+    Dimensions,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { CoffeeItem } from "../constants/Menu";
+import { COLORS } from "../constants/Theme";
 import { useCart } from "../context/CartContext";
 
 interface CoffeeCardProps {
@@ -19,7 +18,7 @@ interface CoffeeCardProps {
 
 const { width } = Dimensions.get("window");
 // Если в браузере экран слишком широкий, ограничим максимальную ширину карточки для красоты
-const cardWidth = width > 600 ? 180 : (width - 40) / 2;
+const cardWidth = width > 600 ? 180 : (width - 70) / 2;
 
 export default function CoffeeCard({ item, onPress }: CoffeeCardProps) {
   const { addToCart } = useCart();
@@ -100,6 +99,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
     overflow: "hidden",
+    margin: 8,
   },
   imageContainer: {
     position: "relative",

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Header from '../components/Header';
 import { COLORS } from '../constants/Theme';
 import { useCart } from '../context/CartContext';
 
@@ -26,7 +25,6 @@ export default function CartScreen() {
   if (cartItems.length === 0) {
     return (
       <View style={styles.container}>
-        <Header title="Корзина" showBackButton={true} />
         <View style={styles.emptyContainer}>
           <Ionicons name="bag-handle-outline" size={80} color={COLORS.textLight} />
           <Text style={styles.emptyTitle}>Ваша корзина пуста</Text>
@@ -45,7 +43,6 @@ export default function CartScreen() {
   // 2. Основной контент корзины
   return (
     <View style={styles.container}>
-      <Header title="Корзина" showBackButton={true} />
 
       {/* Список выбранных товаров */}
       <FlatList
